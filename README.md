@@ -194,7 +194,7 @@ select product,price, count(*) as ct from sales group by 1,2 order by 3 desc;
 select * from sales_format;
 ------------------------------------------------
 -- Query customers table
-select * from sounders_demo_db.customers limit 100;
+select * from demo_db.customers limit 100;
 
 ```
 ## <a name="step-7"></a>Step 7 - Connect to Data from Excel
