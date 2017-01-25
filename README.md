@@ -1,9 +1,10 @@
-# A Turn-Key Data Solution
+# A Quick and Easy End-to-End Data Solution
 ---
+[comment]: <> (Do I use the term Turn-Key or Quick-and-Dirty or Out-of-the-box or Plug-and-Play or some other options?)
 
 We recently had a professional sports team come to us as a potential client. As with any professional sports team, they had a variety of data sources and a need to perform analytics on that data. Their data sources were both internal and external, and in a variety of formats. The primary sources of their data included their CRM running in Microsoft Dynamics, Ticketmaster daily extracts, Point-of-Sale transaction data, and a variety of miscellaneous internal application data. They were wanting to bring all these data sources together to perform analytics to determine the key drivers of season ticket sales, just to start out with. They also wanted a turn-key solution that they would not need to babysit themselves or hire people with tech skills to handle. They needed to have dashboards for executives that would be able to point to a centralized data repository. The dashboards would need to be able to show high level summaries of the data as well as provide drill-down capabilities. The final requirement was that this all needed to be done yesterday.
 
-[Add Somethings about Data Driven Decision Making?]
+[comment]: <> (Add Somethings about Data Driven Decision Making?)
 
 ![Image](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Major_sports_by_state.svg/500px-Major_sports_by_state.svg.png)
 
@@ -12,6 +13,8 @@ While discovering what the client needed, we also discovered something about pro
 This all seems like a *very* tall order, and there are *very* few options that can provide a wholistic and turn-key solution for their needs. Especially in such a short amount of time. And especially not on a small budget. The client essentially was looking for a move-in-ready data environment, and they wanted to be handed the keys right away.
 
 ![Image](http://www.timberlinespirits.com/wp-content/uploads/2015/04/Turnkey.jpg)
+
+[//]: <> (I need to rewrite and revise this paragraph)
 
 Now, typically one can't have their cake and eat it too. Usually it's said you can have fast, quality, or cheap pick any two, because one can't have all three. However, with a winning combination of Amazon Web Services (AWS) providing the building blocks, and 1Strategy performing the building and gluing together of those building blocks, it is possible to achieve all three fast, quality, and cheap.
 
@@ -28,11 +31,11 @@ Below are the steps we took to build out the data environment.
 * [Step 3 - Connect to the Aurora Cluster](#step-3)
 * [Step 4 - Load Data from S3 to Aurora](#step-4)
 * [Step 5 - Format Data to Required Data Types](#step-5)
-* [Step 6 - Query Data](#step-6)
+* [Step 6 - Query the Data](#step-6)
 * [Step 7 - Connect to Data from Excel](#step-7)
 * [Step 8 - Connect to Data from Tableau and Visualize](#step-8)
 
-## <a name="step-1"></a>Step 1 - Create an Aurora Cluster
+### <a name="step-1"></a>Step 1 - Create an Aurora Cluster
 The first step is to create an Aurora cluster. This was done through the AWS Console.
   - Select RDS from the Services Menu
   - Select the database engine, in this case we chose Aurora for the reasons described above.
@@ -44,7 +47,7 @@ The first step is to create an Aurora cluster. This was done through the AWS Con
     * Leave most of the Advanced Settings with the default values with the exception of the Database Name value. For that specify a string of up to 64 alpha-numeric characters that define the name given to a database that Amazon RDS creates when it creates the DB instance, as in “mydb”.
   - Then click Launch DB Instance, and the Aurora database will be created.
 
-## <a name="step-2"></a>Step 2 - Configure Aurora Connection
+### <a name="step-2"></a>Step 2 - Configure Aurora Connection
 The next step is to configure a Role and Security Group for connecting to the Aurora Cluster, and then to associate the Role and Security Group to the Aurora Cluster.
   - Select EC2 from the Services Menu, and then select Security Groups from the sidebar.
   - Select Create Security Group, and then add an inbound rule for MYSQL/Aurora (Type: MYSQL/Aurora, Protocol: TCP, Port: 3306, Source: IP Address), and finally click create.
@@ -71,12 +74,12 @@ The next step is to configure a Role and Security Group for connecting to the Au
     * Select the Role previously created for Aurora from the drop down.
     * Select Done.
 
-## <a name="step-3"></a>Step 3 - Connect to the Aurora Cluster
+### <a name="step-3"></a>Step 3 - Connect to the Aurora Cluster
 In this step you will connect to the Aurora Cluster using a JDBC driver and the following connection string pattern: `jdbc:mysql://<your-aurora-cluster-endpoint>.rds.amazonaws.com:3306/<your-db-name>`
 
 For this example I use SQL Squirrel, but any application that uses JDBC will be able to connect in a similar way.
 
-## <a name="step-4"></a>Step 4 - Load Data from S3 to Aurora
+### <a name="step-4"></a>Step 4 - Load Data from S3 to Aurora
 For this step I used SQL Squirrel to submit the code below to the Aurora Cluster to load sample data that was previously extracted from source and saved in S3.
 
 It is also necessary to set up permissions for Aurora to access S3 before running this see: [link to AWS Documentation](http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Aurora.Authorizing.AWSServices.html?shortFooter=true)
@@ -150,7 +153,7 @@ INTO TABLE demo_db.customers
 SET load_dt = CURRENT_TIMESTAMP
 ;
 ```
-## <a name="step-5"></a>Step 5 - Format Data to Required Data Types
+### <a name="step-5"></a>Step 5 - Format Data to Required Data Types
 When the sample data has been loaded in the previous step, it is all loaded as strings. This was done to ease the loading of data and to make it easier to do data typing in a way that works best with MySQL/Aurora.
 ```SQL
 -- Convert strings to data types
@@ -173,7 +176,7 @@ FROM demo_db.sales
 ;
 ```
 
-## <a name="step-6"></a>Step 6 - Query Data
+### <a name="step-6"></a>Step 6 - Query the Data
 Querying data from Aurora.
 ```SQL
 ------------------------------------------------
@@ -197,10 +200,32 @@ select * from sales_format;
 select * from demo_db.customers limit 100;
 
 ```
-## <a name="step-7"></a>Step 7 - Connect to Data from Excel
-I still need to write up this step.
-## <a name="step-8"></a>Step 8 - Connect to Data from Tableau and Visualize
-I still need to write up this step as well.
+### <a name="step-7"></a>Step 7 - Connect to Data from Excel
+To connect to the Aurora database from Excel is a simple process of using Excel's built in query tools for connecting to external data sources using ODBC connections
+
+![Image](https://blogs.office.com/wp-content/uploads/2015/08/Working-with-external-data-in-Excel-2016-for-Mac-1.png)
+
+Once the connection to the Aurora database has been created then you can use the MSQuery to write SQL and query your data similar to the examples in the previous section. Once your query has been run, the results from the query will be in your Excel spreadsheet. From there you can use all the powers of Excel like Pivot Tables and Charts to visualize and interact with the data.
+
+### <a name="step-8"></a>Step 8 - Connect to Data from Tableau and Visualize
+This section describes how to connect Tableau to a MySQL or Aurora database and set up the data source.
+Before you begin, gather this connection information:
+  - Name of the server that hosts the database you want to connect to
+  - User name and password
+  - Are you connecting to an SSL server?
+Make the connection and set up the data source
+
+On the start page, under Connect, click MySQL, and then do the following:
+    1. Enter the name of the server that hosts the database.
+    2. Enter the user name and password, and then click Sign In.
+    3. Select the Require SSL check box when connecting to an SSL server.
+From the Database drop-down list, select a database or use the text box to search for a database by name.
+
+Under Table, select a table or use the text box to search for a table by name.
+
+Drag the table to the canvas, and then click the sheet tab to start your analysis.
+
+Use custom SQL to connect to a specific query rather than the entire data source. For more information.
 
 ## Summary and Conclusions.
-I still need to write this section.
+In the end a customer can get up and running and using an end-to-end data solution very quickly and easily using AWS's services, and a few short scripts they have an end-to-end solution.
